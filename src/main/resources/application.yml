@@ -1,0 +1,43 @@
+server:
+  port: 3088
+
+spring:
+  application:
+    name: trade-history-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/tradding_db
+    username: root
+    password: ellenverma
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+
+
+  scheduler:
+    indicator-delay-ms: 60000
+    candle-flush-delay-ms: 1000
+
+  backtest:
+    publish: true
+    persist: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.kafka: INFO
+    com.trade.market: DEBUG
+
+
+broker:
+  service:
+    url: http://localhost:3077/broker
