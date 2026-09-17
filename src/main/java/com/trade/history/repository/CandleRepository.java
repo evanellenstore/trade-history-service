@@ -44,7 +44,7 @@ public interface CandleRepository extends JpaRepository<Candle, Long> {
     Optional<Candle> findBySymbolTokenAndTimeframeAndCandleTime(String symbolToken, String timeframe,
                                                                   LocalDateTime candleTime);
 
-        @Query("SELECT c.symbolToken AS symbolToken, COUNT(c) AS candleCount, MAX(c.createdAt) AS updatedAt "
+        @Query("SELECT c.symbolToken AS symbolToken, COUNT(c) AS candleCount, MAX(c.candleTime) AS updatedAt "
             + "FROM Candle c WHERE c.symbolToken IN :symbolTokens AND c.timeframe = :timeframe "
             + "GROUP BY c.symbolToken")
         List<BackfillStatus> findBackfillStatus(@Param("symbolTokens") List<String> symbolTokens,
