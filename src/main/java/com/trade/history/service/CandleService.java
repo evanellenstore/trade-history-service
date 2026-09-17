@@ -27,14 +27,14 @@ public class CandleService {
 
     public int fetchAndSave(String tradingSymbol, String symbolToken, String fromDate, String toDate,
                             String interval, String exchange) {
-        Object responseBody = brokerServiceClient.getCandleData(tradingSymbol, symbolToken, fromDate, toDate, interval).getBody();
+        String responseBody = brokerServiceClient.getCandleData(tradingSymbol, symbolToken, fromDate, toDate, interval).getBody();
 
         if (responseBody == null) {
             throw new IllegalStateException("Broker returned an empty candle response");
         }
 
         try {
-            JsonNode root = objectMapper.readTree(responseBody.toString());
+            JsonNode root = objectMapper.readTree(responseBody);
             JsonNode rows = root.path("data");
             if (!rows.isArray()) {
                 throw new IllegalStateException("Broker response does not contain candle data");

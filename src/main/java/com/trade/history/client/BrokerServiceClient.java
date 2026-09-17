@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "trade-broker-service", url = "${broker.service.url}")
 public interface BrokerServiceClient {
 
-    @GetMapping("/broker/api/angelOne/candlesData")
-   public ResponseEntity<?> getCandleData(@RequestParam String tradingSymbol,	@RequestParam String symbolToken,
+    @GetMapping("/api/angelOne/candlesData")
+	public ResponseEntity<String> getCandleData(@RequestParam String tradingSymbol,	@RequestParam String symbolToken,
 			@RequestParam String fromDate,@RequestParam String toDate,@RequestParam String interval);
 }
