@@ -30,6 +30,15 @@ public class TradeHistoryController {
         return ResponseEntity.ok(ApiResponse.success("UP", "Service is running"));
     }
 
+    @GetMapping("/candles/status")
+    public ResponseEntity<ApiResponse<Map<String, Map<String, Object>>>> candleBackfillStatus(
+            @RequestParam List<String> symbolTokens,
+            @RequestParam String timeframe) {
+        return ResponseEntity.ok(ApiResponse.success(
+                candleService.getBackfillStatus(symbolTokens, timeframe),
+                "Candle backfill status loaded"));
+    }
+
     @GetMapping("/candles/backfill")
     public ResponseEntity<ApiResponse<Integer>> backfillCandles(
             @RequestParam String tradingSymbol,

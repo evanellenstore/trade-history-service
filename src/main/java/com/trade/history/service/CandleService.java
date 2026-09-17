@@ -11,7 +11,9 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +74,22 @@ public class CandleService {
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to parse broker candle response", exception);
         }
+    }
+
+    public Map<String, Map<String, Object>> getBackfillStatus(List<String> symbolTokens, String timeframe) {
+        Map<String, Map<String, Object>> status = new LinkedHashMap<>();
+        if (symbolTokens == null || symbolTokens.isEmpty() || timeframe == null || timeframe.isBlank()) {
+            return status;
+        }
+
+        candleRepository.findBackfillStatus(symbolTokens, timeframe).forEach(item -> {
+            Map<String, Object> itemStatus = new LinkedHashMap<>();
+            itemStatus.put("status", "backfilled");
+            itemStatus.put("candleCount", item.getCandleCount());
+            itemStatus.put("updatedAt", item.getUpdatedAt());
+            status.put(item.getSymbolToken(), itemStatus);
+        });
+        return status;
     }
 
     private LocalDateTime parseCandleTime(String value) {
