@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-    name = "market_candles",
+    name = "market_candles_backtest",
     indexes = {
         @Index(
             name = "idx_market_candles_symbol_token_timeframe_candle_time",
