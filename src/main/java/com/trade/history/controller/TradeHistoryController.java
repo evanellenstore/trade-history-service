@@ -87,6 +87,41 @@ public class TradeHistoryController {
         return ResponseEntity.ok(ApiResponse.success(result, "Candle backfill completed"));
     }
 
+    @PostMapping("/candles/sync")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> syncCandlesBatch(
+            @RequestBody CandleSyncBatchRequest request) {
+        if (request.symbols() == null || request.symbols().isEmpty()
+                || request.toDate() == null || request.interval() == null) {
+            return ResponseEntity.badRequest().body(ApiResponse.success(
+                    Map.of("message", "At least one symbol, a target date, and an interval are required"),
+                    "Invalid candle sync request"));
+        }
+
+        List<String> successfulSymbols = new ArrayList<>();
+        List<String> failedSymbols = new ArrayList<>();
+        int savedCandles = 0;
+        String exchange = request.exchange() == null || request.exchange().isBlank() ? "NSE" : request.exchange();
+
+        for (CandleSyncBatchRequest.Symbol symbol : request.symbols()) {
+            try {
+                savedCandles += candleService.fetchAndSave(
+                        symbol.tradingSymbol(), symbol.symbolToken(), symbol.fromDate(), request.toDate(),
+                        request.interval(), exchange);
+                successfulSymbols.add(symbol.tradingSymbol());
+            } catch (Exception exception) {
+                log.error("Candle sync failed for {}", symbol.tradingSymbol(), exception);
+                failedSymbols.add(symbol.tradingSymbol());
+            }
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("requestedSymbols", request.symbols().size());
+        result.put("savedCandles", savedCandles);
+        result.put("successfulSymbols", successfulSymbols);
+        result.put("failedSymbols", failedSymbols);
+        return ResponseEntity.ok(ApiResponse.success(result, "Candle sync completed"));
+    }
+
     
 }
 
