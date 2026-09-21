@@ -47,6 +47,7 @@ public class TradeHistoryController {
             @RequestParam String toDate,
             @RequestParam String interval,
             @RequestParam(defaultValue = "NSE") String exchange) {
+                
         int savedCount = candleService.fetchAndSave(
                 tradingSymbol, symbolToken, fromDate, toDate, interval, exchange);
         return ResponseEntity.ok(ApiResponse.success(savedCount, "Candles saved successfully"));
