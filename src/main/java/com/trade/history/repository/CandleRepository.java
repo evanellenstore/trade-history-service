@@ -1,6 +1,8 @@
 package com.trade.history.repository;
 
 import com.trade.history.entity.Candle;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +14,12 @@ import java.util.Optional;
 
 @Repository
 public interface CandleRepository extends JpaRepository<Candle, Long> {
+
+    interface SymbolTimeframe {
+        String getSymbol();
+        String getSymbolToken();
+        String getTimeframe();
+    }
 
     interface BackfillStatus {
         String getSymbolToken();
@@ -43,6 +51,18 @@ public interface CandleRepository extends JpaRepository<Candle, Long> {
 
     Optional<Candle> findBySymbolTokenAndTimeframeAndCandleTime(String symbolToken, String timeframe,
                                                                   LocalDateTime candleTime);
+
+        Slice<Candle> findBySymbolTokenAndTimeframeOrderByCandleTimeAsc(
+            String symbolToken, String timeframe, Pageable pageable);
+
+        @Query("SELECT DISTINCT c.symbol AS symbol, c.symbolToken AS symbolToken, c.timeframe AS timeframe "
+            + "FROM Candle c WHERE c.symbol = :symbol AND c.timeframe = :timeframe")
+        List<SymbolTimeframe> findSymbolTimeframe(@Param("symbol") String symbol,
+                               @Param("timeframe") String timeframe);
+
+        @Query("SELECT DISTINCT c.symbol AS symbol, c.symbolToken AS symbolToken, c.timeframe AS timeframe "
+            + "FROM Candle c")
+        List<SymbolTimeframe> findDistinctSymbolTimeframeCombinations();
 
         @Query("SELECT c.symbolToken AS symbolToken, COUNT(c) AS candleCount, MAX(c.candleTime) AS updatedAt "
             + "FROM Candle c WHERE c.symbolToken IN :symbolTokens AND c.timeframe = :timeframe "
