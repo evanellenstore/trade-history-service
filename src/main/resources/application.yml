@@ -36,19 +36,6 @@ logging:
     root: INFO
     org.springframework.kafka: INFO
     com.trade.market: DEBUG
-
-training:
-  dataset:
-    page-size: 1000
-    insert-batch-size: 500
-    target-return-threshold-pct: 3.0
-    horizons:
-      ONE_MINUTE: 50
-      FIVE_MINUTE: 30
-      FIFTEEN_MINUTE: 20
-      ONE_HOUR: 10
-
-
 broker:
   service:
     url: http://localhost:3077/broker

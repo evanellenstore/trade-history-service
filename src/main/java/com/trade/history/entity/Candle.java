@@ -54,9 +54,6 @@ public class Candle {
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "candle", fetch = FetchType.LAZY)
-    private BacktestMarketIndicator indicator;
-    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
