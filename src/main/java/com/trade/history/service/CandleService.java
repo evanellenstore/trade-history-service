@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CandleService {
     private static final DateTimeFormatter BROKER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private static final int MAX_BROKER_WINDOW_DAYS = 29;
     
     private final CandleRepository candleRepository;
     private final BrokerServiceClient brokerServiceClient;
@@ -37,23 +36,8 @@ public class CandleService {
             throw new IllegalArgumentException("fromDate must be before toDate");
         }
 
-        int saved = 0;
-        LocalDateTime windowStart = start;
-        while (!windowStart.isAfter(end)) {
-            LocalDateTime windowEnd = windowStart.plusDays(MAX_BROKER_WINDOW_DAYS);
-            if (windowEnd.isAfter(end)) {
-                windowEnd = end;
-            }
-            saved += fetchAndSaveWindow(tradingSymbol, symbolToken, windowStart, windowEnd, interval, exchange);
-            windowStart = windowEnd.plusMinutes(1);
-        }
-        return saved;
-    }
-
-    private int fetchAndSaveWindow(String tradingSymbol, String symbolToken, LocalDateTime fromDate,
-                                   LocalDateTime toDate, String interval, String exchange) {
         String responseBody = brokerServiceClient.getCandleData(tradingSymbol, symbolToken,
-                BROKER_DATE_FORMAT.format(fromDate), BROKER_DATE_FORMAT.format(toDate), interval).getBody();
+                BROKER_DATE_FORMAT.format(start), BROKER_DATE_FORMAT.format(end), interval).getBody();
         if (responseBody == null) {
             throw new IllegalStateException("Broker returned an empty candle response");
         }
@@ -80,7 +64,7 @@ public class CandleService {
                 }
             }
             candleRepository.saveAll(candles);
-            log.info("Saved {} candles for {} from {} to {}", candles.size(), tradingSymbol, fromDate, toDate);
+            log.info("Saved {} candles for {} from {} to {}", candles.size(), tradingSymbol, start, end);
             return candles.size();
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to parse broker candle response", exception);
