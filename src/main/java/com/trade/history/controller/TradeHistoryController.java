@@ -25,10 +25,21 @@ public class TradeHistoryController {
 
     private final CandleService candleService;
 
+    /**
+     * Health check endpoint to verify if the service is running.
+     * @return
+     */
     @GetMapping("/health")
     public ResponseEntity<ApiResponse<Object>> health() {
         return ResponseEntity.ok(ApiResponse.success("UP", "Service is running"));
     }
+
+    /**
+     * Endpoint to get the backfill status of candles for given symbol tokens and timeframe.
+     * @param symbolTokens List of symbol tokens to check the backfill status for.
+     * @param timeframe The timeframe for which to check the backfill status.
+     * @return A response entity containing the backfill status of candles.
+     */
 
     @GetMapping("/candles/status")
     public ResponseEntity<ApiResponse<Map<String, Map<String, Object>>>> candleBackfillStatus(
@@ -38,6 +49,17 @@ public class TradeHistoryController {
                 candleService.getBackfillStatus(symbolTokens, timeframe),
                 "Candle backfill status loaded"));
     }
+
+    /**
+     * Endpoint to backfill candles for a given trading symbol and symbol token within a specified date range and interval.
+     * @param tradingSymbol The trading symbol for which to backfill candles.
+     * @param symbolToken The symbol token associated with the trading symbol.
+     * @param fromDate The start date of the backfill range (inclusive).
+     * @param toDate The end date of the backfill range (inclusive).
+     * @param interval The interval for the candles (e.g., 1m, 5m, 1h, etc.).
+     * @param exchange The exchange where the trading symbol is listed (default is "NSE").
+     * @return A response entity containing the number of candles saved during the backfill process.
+     */
 
     @GetMapping("/candles/backfill")
     public ResponseEntity<ApiResponse<Integer>> backfillCandles(
@@ -53,6 +75,11 @@ public class TradeHistoryController {
         return ResponseEntity.ok(ApiResponse.success(savedCount, "Candles saved successfully"));
     }
 
+    /**
+     * Endpoint to backfill candles for multiple symbols in a batch request.
+     * @param request The CandleBackfillBatchRequest containing the symbols, date range, interval, and exchange.
+     * @return A response entity containing the result of the backfill operation, including successful and failed symbols.
+     */
     @PostMapping("/candles/backfill")
     public ResponseEntity<ApiResponse<Map<String, Object>>> backfillCandlesBatch(
             @RequestBody CandleBackfillBatchRequest request) {
@@ -88,6 +115,12 @@ public class TradeHistoryController {
         return ResponseEntity.ok(ApiResponse.success(result, "Candle backfill completed"));
     }
 
+    /**
+     * Endpoint to synchronize candles for multiple symbols in a batch request.
+     * @param request The CandleSyncBatchRequest containing the symbols, date range, interval, and exchange.
+     * @return A response entity containing the result of the sync operation, including successful and failed symbols.
+     */
+    
     @PostMapping("/candles/sync")
     public ResponseEntity<ApiResponse<Map<String, Object>>> syncCandlesBatch(
             @RequestBody CandleSyncBatchRequest request) {
