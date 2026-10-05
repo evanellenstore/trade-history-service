@@ -6,7 +6,7 @@ spring:
     name: trade-history-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/tradding_db
+    url: ${DB_URL:jdbc:mysql://localhost:3306/tradding_db}
     username: root
     password: ellenverma
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -38,4 +38,4 @@ logging:
     com.trade.market: DEBUG
 broker:
   service:
-    url: http://localhost:3077/broker
+    url: ${BROKER_SERVICE_URL:http://localhost:3077/broker}
